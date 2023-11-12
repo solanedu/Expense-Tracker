@@ -58,6 +58,7 @@
 </head>
 
 <body>
+    <!-- Navigation Bar -->
 
     <div class="navbar">
         <a href="display_employees.php">Employees</a>
@@ -70,7 +71,11 @@
 
         <h1>Expense Tracker</h1>
 
+        <!-- Add New Expense Form -->
+
         <h2>Add New Expense</h2>
+
+<!-- Form for adding a new expense -->
 
  <div class="add-expense-form">
     <form action="add_expense.php" method="post" onsubmit="return validateForm()">
@@ -96,6 +101,9 @@
         <button type="submit">Add Expense</button>
     </form>
 
+<!-- JavaScript function for form validation -->
+
+
 <script>
     function validateForm() {
     var amount = document.getElementById("amount").value;
@@ -112,11 +120,13 @@
 
 </div>
         <h2>Expense List</h2>
-        <?php
-        include 'db_connection.php';
 
+        
+<?php
+include 'db_connection.php';
 
-        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delete_expense"])) {
+// Check if form submitted and delete button pressed
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delete_expense"])) {
     $expenseName = $_POST["expense_name"];
     $sql = "DELETE FROM Expenses WHERE ExpenseName = '$expenseName'";
     if ($conn->query($sql) === TRUE) {
@@ -126,12 +136,57 @@
     }
 }
 
-$sql = "SELECT * FROM Expenses";
+// Define default sorting options
+$sortColumn = isset($_GET['sort']) ? $_GET['sort'] : 'ExpenseDate';
+$sortOrder = isset($_GET['order']) ? $_GET['order'] : 'DESC';
+
+// Map user-friendly column names to actual column names in the database
+$columnMapping = [
+    'expense_name' => 'ExpenseName',
+    'date' => 'ExpenseDate',
+    'purchase_type' => 'PurchaseType',
+    'vendor' => 'Vendor',
+    'amount' => 'Amount'
+];
+
+// Validate and set the actual column name
+if (array_key_exists($sortColumn, $columnMapping)) {
+    $actualSortColumn = $columnMapping[$sortColumn];
+} else {
+    // Default to ExpenseDate if an invalid column is provided
+    $actualSortColumn = 'ExpenseDate';
+}
+
+// Select all expenses from the database with sorting
+$sql = "SELECT * FROM Expenses ORDER BY $actualSortColumn $sortOrder";
 $result = $conn->query($sql);
 
+// Display the expense list in a table
 if ($result->num_rows > 0) {
+    echo "<form method='get' action='expenses.php'>";
+    echo "<label for='sortColumn'>Sort By:</label>";
+    echo "<select id='sortColumn' name='sort'>";
+    $currentSortColumn = array_search($actualSortColumn, $columnMapping);
+    foreach ($columnMapping as $key => $value) {
+        echo "<option value='$key' " . ($currentSortColumn == $key ? 'selected' : '') . ">" . ucwords(str_replace('_', ' ', $key)) . "</option>";
+    }
+    echo "</select>";
+
+    echo "<label for='sortOrder'>Order:</label>";
+    echo "<select id='sortOrder' name='order'>";
+    $orderOptions = ['ASC', 'DESC'];
+    foreach ($orderOptions as $option) {
+        echo "<option value='$option' " . ($sortOrder == $option ? 'selected' : '') . ">" . ucwords(strtolower($option)) . "</option>";
+    }
+    echo "</select>";
+
+    echo "<button type='submit'>Apply Sorting</button>";
+    echo "</form>";
+
     echo "<table><tr><th>Expense Name</th><th>Date</th><th>Purchase Type</th><th>Vendor</th><th>Amount</th><th>Action</th></tr>";
+
     while ($row = $result->fetch_assoc()) {
+        // Display each expense as a table row with a delete button
         echo "<tr><td>".$row["ExpenseName"]."</td><td>".$row["ExpenseDate"]."</td><td>".$row["PurchaseType"]."</td><td>".$row["Vendor"]."</td><td>".$row["Amount"]."</td><td>
               <form method='post' action='expenses.php'>
               <input type='hidden' name='expense_name' value='".$row["ExpenseName"]."'>
@@ -144,6 +199,7 @@ if ($result->num_rows > 0) {
     echo "No expenses recorded.";
 }
 $conn->close();
+
 ?>
 
     </div>
