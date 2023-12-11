@@ -61,7 +61,7 @@
     <!-- Navigation Bar -->
 
     <div class="navbar">
-        <a href="display_employees.php">Employees</a>
+       <!-- <a href="display_employees.php">Employees</a> -->
         <a href="expenses.php">Expenses</a>
         <a href="inventory.php">Inventory</a>
         <a href="sales.php">Sales</a>
@@ -87,9 +87,10 @@
 
         <label for="purchase_type">Expense Type:</label>
         <select id="purchase_type" name="purchase_type" required>
-            <option value="ingredient">Ingredient</option>
-            <option value="supplies">Supplies</option>
-            <option value="bills">Bills</option>
+            <option value="insurance">Insurance</option>
+            <option value="rent">Rent</option>
+            <option value="utility">Utility</option>
+
         </select><br><br>
 
         <label for="vendor">Vendor (Optional):</label>

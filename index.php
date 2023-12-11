@@ -50,7 +50,7 @@
 <body>
 
     <div class="navbar">
-        <a href="display_employees.php">Employees</a>
+        <!-- <a href="display_employees.php">Employees</a> -->
         <a href="expenses.php">Expenses</a>
         <a href="inventory.php">Inventory</a>
         <a href="sales.php">Sales</a>
